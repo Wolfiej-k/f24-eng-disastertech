@@ -8,10 +8,10 @@ services:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       - api
-  
+
   api:
     build:
       context: .
@@ -24,7 +24,7 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
     ports:
-      - '4000:4000'
+      - "4000:4000"
     depends_on:
       - postgres
       - llama
@@ -40,7 +40,7 @@ services:
       - LLAMA_ARG_PORT=8080
     volumes:
       - models:/models
-    
+
   # https://github.com/pgvector/pgvector?tab=readme-ov-file#additional-installation-methods
   postgres:
     image: pgvector/pgvector:pg17

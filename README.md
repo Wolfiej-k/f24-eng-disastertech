@@ -5,6 +5,7 @@
 #### Clone repository
 
 `cd` into a desired destination folder and clone the repo:
+
 ```
 git clone git@github.com:Wolfiej-k/f24-eng-disastertech.git
 ```
@@ -12,6 +13,7 @@ git clone git@github.com:Wolfiej-k/f24-eng-disastertech.git
 #### Enable tooling
 
 Open the project folder in VS Code. You can do so with this useful shortcut:
+
 ```shell
 cd f24-eng-disastertech
 code .
@@ -27,20 +29,22 @@ To develop the frontend, we recommend you install dependencies to your local OS 
 
 - If you get something like "command not found," you might not have npm installed.
 - If successful, you should see something like:
-    ```shell
-    added 414 packages, and audited 415 packages in 13s
 
-    149 packages are looking for funding
-    run `npm fund` for details
+  ```shell
+  added 414 packages, and audited 415 packages in 13s
 
-    found 0 vulnerabilities
-    ```
+  149 packages are looking for funding
+  run `npm fund` for details
+
+  found 0 vulnerabilities
+  ```
 
 Run `npm run dev`, which should launch the Next.js server.
 
 #### Launch containers
 
 The full application has multiple components (frontend, backend, LLM, and database), which we containerize into isolated Linux systems with [Docker](https://www.docker.com/). To run the development server, install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and run:
+
 ```shell
 docker-compose build
 docker-compose up
