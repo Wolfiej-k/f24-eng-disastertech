@@ -7,6 +7,6 @@ RUN npm install
 
 COPY tsconfig.json next.config.mjs ./
 COPY postcss.config.mjs tailwind.config.ts ./
-COPY ./src/app ./src/app
+COPY ./src ./src
 
 CMD ["npm", "run", "dev"]

@@ -46,8 +46,7 @@ Run `npm run dev`, which should launch the Next.js server.
 The full application has multiple components (frontend, backend, LLM, and database), which we containerize into isolated Linux systems with [Docker](https://www.docker.com/). To run the development server, install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and run:
 
 ```shell
-docker-compose build
-docker-compose up
+docker-compose up --build
 ```
 
 Verify that `app`, `api`, `llama`, and `database` launch without error, and the Llama model begins downloading. The Next.js server should be live at http://localhost:3000 and the Flask backend at http://localhost:4000. The llama.cpp and Postgres servers should also be live at http://llama:8080 and http://postgres:5432, respectively, but these are only exposed within the Docker network. Let us know if you have any issues, as we're not Docker experts!
