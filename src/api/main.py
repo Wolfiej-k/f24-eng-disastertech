@@ -3,6 +3,8 @@ import psycopg2
 import os
 from datetime import datetime
 import numpy as np
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')  # You can choose other models
 
 app = Flask(__name__)
 
@@ -33,8 +35,9 @@ conn = psycopg2.connect(
 
 # Embedding model (example using a dummy model)
 def compute_embedding(text):
-    # Dummy embedding: replace with actual model
-    return np.random.rand(100).tolist()
+    # Compute the embedding for the given text
+    embedding = model.encode(text).tolist()  # Convert numpy array to a list
+    return embedding
 
 @app.route("/documents", methods=['POST'])
 def create_document():
