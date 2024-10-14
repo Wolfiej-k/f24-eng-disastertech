@@ -1,3 +1,9 @@
+-- Create the t4sg user with the specified password
+CREATE ROLE t4sg WITH LOGIN PASSWORD 'disaster-tech-labs';
+
+-- Grant privileges on the database offline-ai to t4sg
+GRANT ALL PRIVILEGES ON DATABASE "offline-ai" TO t4sg;
+
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- RAG documents and their vector embeddings
