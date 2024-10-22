@@ -1,4 +1,4 @@
-Flask==3.0.3
-PSycopg2==2.9.1
+flask==3.0.3
+psycopg2==2.9.10
 numpy==2.0.0
 sentence-transformers

@@ -1,9 +1,11 @@
--- Create the t4sg user with the specified password
+-- Grant privileges on the database and all tables
 CREATE ROLE t4sg WITH LOGIN PASSWORD 'disaster-tech-labs';
-
--- Grant privileges on the database offline-ai to t4sg
 GRANT ALL PRIVILEGES ON DATABASE "offline-ai" TO t4sg;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO t4sg;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO t4sg;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO t4sg;
 
+-- Load pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- RAG documents and their vector embeddings
@@ -11,7 +13,7 @@ CREATE TABLE IF NOT EXISTS documents (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    embedding VECTOR(384) NOT NULL,  -- The number 384 corresponds to the dimensionality of the embedding
+    embedding VECTOR(384) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
