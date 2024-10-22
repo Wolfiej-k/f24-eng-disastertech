@@ -1,13 +1,9 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.formatDocument": "explicit",
-    "source.fixAll.eslint": "explicit"
-  },
-  "[dockerfile]": {
-    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
   }
 }
