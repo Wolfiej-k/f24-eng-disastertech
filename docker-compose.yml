@@ -18,13 +18,15 @@ services:
       dockerfile: api.Dockerfile
     container_name: backend
     environment:
-      - POSTGRES_USER=t4sg
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=disaster-tech-labs
       - POSTGRES_DB=offline-ai
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
     ports:
       - "4000:4000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - postgres
       - llama
@@ -38,6 +40,8 @@ services:
       - LLAMA_ARG_MODEL=/models/llama.gguf
       - LLAMA_ARG_CTX_SIZE=4096
       - LLAMA_ARG_PORT=8080
+      - LLAMA_ARG_METRICS=1
+    command: ["--metrics"]
     volumes:
       - models:/models
 

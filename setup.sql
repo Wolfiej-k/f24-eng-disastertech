@@ -1,13 +1,21 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- RAG documents and their vector embeddings
-CREATE TABLE IF NOT EXISTS documents (
+-- Documents table to store metadata
+CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    embedding VECTOR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Chunks table with pgvector embeddings for retrieval
+CREATE TABLE document_chunks (
+    id SERIAL PRIMARY KEY,
+    doc_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
+    chunk_index INTEGER NOT NULL,
+    chunk_text TEXT NOT NULL,
+    embedding vector(384)  -- Adjust size to match your model
 );
 
 -- Search heuristic (compare with HNSW)
-CREATE INDEX ON documents USING ivfflat (embedding vector_ip_ops)
+CREATE INDEX ON document_chunks USING ivfflat (embedding vector_ip_ops)
