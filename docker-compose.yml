@@ -18,7 +18,7 @@ services:
       dockerfile: api.Dockerfile
     container_name: backend
     environment:
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=t4sg
       - POSTGRES_PASSWORD=disaster-tech-labs
       - POSTGRES_DB=offline-ai
       - POSTGRES_HOST=postgres
