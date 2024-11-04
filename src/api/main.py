@@ -15,17 +15,13 @@ model = SentenceTransformer('paraphrase-MiniLM-L6-v2')  # Use any model that fit
 app = Flask(__name__)
 
 # Load environment variables
-POSTGRES_DB = os.getenv('POSTGRES_DB')
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-POSTGRES_HOST = os.getenv('POSTGRES_HOST')
 
 # Database connection
 conn = psycopg2.connect(
-    dbname=POSTGRES_DB,
-    user=POSTGRES_USER,
-    password=POSTGRES_PASSWORD,
-    host=POSTGRES_HOST
+    dbname=os.getenv("POSTGRES_DB"),
+    user=os.getenv("POSTGRES_USER"),
+    password=os.getenv("POSTGRES_PASSWORD"),
+    host=os.getenv("POSTGRES_HOST"),
 )
 
 # Helper function: Chunk text into manageable parts
