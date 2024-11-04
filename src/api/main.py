@@ -46,17 +46,21 @@ def get_documents():
     return jsonify([parse_document(doc) for doc in docs]), 200
 
 
-# Get a single document.
+# Get a single document by ID
 @app.route("/documents/<int:id>", methods=["GET"])
 def get_document(id: int):
     with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM documents WHERE id = %s;", (id,))
-        doc = cursor.fetchone()
-
-    if doc:
-        return jsonify(parse_document(doc)), 200
-    else:
-        return jsonify({"error": "Document not found"}), 404
+        cursor.execute("SELECT id, title, content, created_at FROM documents WHERE id = %s;", (id,))
+        row = cursor.fetchone()
+        if not row:
+            return jsonify({"message": "Document not found"}), 404
+        document = {
+            "id": row[0],
+            "title": row[1],
+            "content": row[2],
+            "created_at": row[3].isoformat(),
+        }
+    return jsonify(document), 200
 
 
 # Create a single document.
@@ -107,6 +111,48 @@ def delete_document(id: int):
         conn.commit()
 
     return jsonify({"message": "Document deleted"}), 200
+
+
+# Partially update a single document
+@app.route("/documents/<int:id>", methods=["PATCH"])
+def patch_document(id: int):
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No input data provided"}), 400
+
+    fields = []
+    values = []
+
+    content_updated = False
+    new_content = None
+
+    if "title" in data:
+        fields.append("title = %s")
+        values.append(data["title"])
+
+    if "content" in data:
+        fields.append("content = %s")
+        values.append(data["content"])
+        content_updated = True
+        new_content = data["content"]
+
+    # If content is updated, recompute the embedding
+    if content_updated:
+        embedding = compute_embedding(new_content)
+        fields.append("embedding = %s")
+        values.append(embedding)
+
+    if not fields:
+        return jsonify({"message": "No valid fields provided for update"}), 400
+
+    values.append(id)
+    sql = f"UPDATE documents SET {', '.join(fields)} WHERE id = %s;"
+
+    with conn.cursor() as cursor:
+        cursor.execute(sql, tuple(values))
+        conn.commit()
+
+    return jsonify({"message": "Document updated"}), 200
 
 
 if __name__ == "__main__":

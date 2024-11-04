@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { TypographyP } from "@/components/ui/typography";
 import EditDocDialog from "./EditDocDialog";
+import Link from "next/link";
 
 interface Document {
   id: number;
@@ -46,7 +47,11 @@ const DocumentsList: React.FC = () => {
       {documents.map((doc) => (
         <Card key={doc.id} className="flex flex-col">
           <CardHeader>
-            <CardTitle>{doc.title}</CardTitle>
+            <CardTitle>
+              <Link href={`/docs/${doc.id}`} className="text-blue-600 hover:underline">
+                {doc.title}
+              </Link>
+            </CardTitle>
             <TypographyP className="text-sm text-muted-foreground">
               Created at: {new Date(doc.created_at).toLocaleString()}
             </TypographyP>
