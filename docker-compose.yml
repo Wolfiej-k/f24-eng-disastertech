@@ -9,6 +9,11 @@ services:
       - API_PORT=4000
     ports:
       - "3000:3000"
+    volumes:
+      - ./src/app:/app/src/app
+      - ./src/components:/app/src/components
+      - ./src/hooks:/app/src/hooks
+      - ./src/lib:/app/src/lib
     depends_on:
       - api
 
@@ -25,6 +30,7 @@ services:
       - POSTGRES_PORT=5432
       - API_PORT=4000
     volumes:
+      - ./src/api:/api/src/api
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - postgres
@@ -38,7 +44,6 @@ services:
       - LLAMA_ARG_MODEL_URL=https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q3_K_L.gguf
       - LLAMA_ARG_MODEL=/models/llama.gguf
       - LLAMA_ARG_CTX_SIZE=4096
-      - LLAMA_ARG_N_PREDICT=64
       - LLAMA_N_BATCH=512
       - LLAMA_N_CTX=2048
       - LLAMA_ARG_PORT=8080

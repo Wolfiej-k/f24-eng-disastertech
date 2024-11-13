@@ -21,6 +21,4 @@ RUN apt-get update && \
 
 RUN pip install -r requirements.txt
 
-COPY ./src/api ./
-
-CMD ["python", "main.py"]
+CMD ["python", "src/api/main.py"]

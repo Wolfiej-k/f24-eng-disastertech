@@ -1,5 +1,11 @@
-import { TypographyH1 } from "@/components/ui/typography";
+import Header from "@/components/ui/header";
+import ChatBox from "./chat-box";
 
 export default async function Home() {
-  return <TypographyH1>Welcome to T4SG!</TypographyH1>;
+  return (
+    <>
+      <Header title="Welcome to Disaster Tech Lab!" subtitle="Send a message to chat with the Disaster Bot." />
+      <ChatBox />
+    </>
+  );
 }

@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from http import HTTPStatus
 import os
 
 from documents import get_documents, create_document, get_document, update_document, delete_document
-from query import query_llama
+from query import build_prompt, stream_llama
 from stats import container_stats, container_health
 
 app = Flask(__name__)
@@ -36,11 +36,9 @@ def handle_document(id: int):
 @app.route("/query", methods=["POST"])
 def handle_query():
   data = request.get_json()
-  response = query_llama(data.get("query"))
-  if response:
-    return jsonify(response), HTTPStatus.OK
-  else:
-    return "", HTTPStatus.INTERNAL_SERVER_ERROR
+  prompt = build_prompt(data.get("query"))
+  stream = stream_llama(prompt)
+  return Response(stream_with_context(stream), content_type='text/plain')
 
 @app.route("/stats", methods=["GET"])
 def handle_stats():
