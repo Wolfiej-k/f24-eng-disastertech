@@ -1,17 +1,17 @@
 interface HeaderProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  button?: JSX.Element;
 }
 
-export default function Header({ title, subtitle }: HeaderProps) {
+export default function Header({ title, subtitle, button }: HeaderProps) {
   return (
-    <>
-      <header className="relative flex items-center justify-between bg-primary px-6 py-4 text-white">
-        <div>
-          <h1 className="mb-1 text-2xl font-bold">{title}</h1>
-          <p className="text-lg">{subtitle}</p>
-        </div>
+    <div className="flex items-center justify-between bg-primary px-6 py-4">
+      <header className="text-white">
+        <h1 className="text-2xl font-bold">{title}</h1>
+        {subtitle && <p className="text-lg">{subtitle}</p>}
       </header>
-    </>
+      {button && <div className="flex items-center">{button}</div>}
+    </div>
   );
 }

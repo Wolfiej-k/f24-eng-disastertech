@@ -130,7 +130,7 @@ export default function ChatBox() {
 
   return (
     <>
-      <div className="mx-8 flex h-full flex-col">
+      <div className="m-8 flex h-full flex-col">
         <div className="flex-grow overflow-y-auto" style={{ marginBottom: "90px", overscrollBehavior: "contain" }}>
           <ChatMessageList className="overflow-y-auto">
             {history.map((message, index) => (
