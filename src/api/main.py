@@ -3,7 +3,7 @@ from http import HTTPStatus
 import os
 
 from documents import get_documents, create_document, get_document, update_document, delete_document
-from query import build_prompt, stream_llama
+from query import build_context, stream_llama
 from stats import container_stats, container_health
 
 app = Flask(__name__)
@@ -36,9 +36,12 @@ def handle_document(id: int):
 @app.route("/query", methods=["POST"])
 def handle_query():
   data = request.get_json()
-  prompt = build_prompt(data.get("query"))
-  stream = stream_llama(prompt)
-  return Response(stream_with_context(stream), content_type='text/plain')
+  context = build_context(data.get("query"))
+  stream = stream_llama(context)
+  return Response(
+    stream_with_context(stream),
+    content_type='text/plain'
+  )
 
 @app.route("/stats", methods=["GET"])
 def handle_stats():

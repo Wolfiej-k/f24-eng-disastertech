@@ -4,7 +4,6 @@ import os
 import re
 import datetime
 from dataclasses import dataclass, asdict
-from typing import Optional
 
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
@@ -15,7 +14,7 @@ conn = psycopg2.connect(
   host=os.getenv("POSTGRES_HOST"),
 )
 
-def chunk_text(text: str, max_length=500) -> list[str]:
+def chunk_text(text: str, max_length=500):
   """Split text into chunks of at most `max_length` tokens.
   Keeps sentences together where possible."""
   sentences = re.split(r'(?<=[.!?]) +', text)
@@ -43,7 +42,7 @@ def chunk_text(text: str, max_length=500) -> list[str]:
 
   return chunks
 
-def embed_text(text: str) -> list[float]:
+def embed_text(text: str):
   """Compute normalized embedding of input text."""
   embedding = model.encode(text, normalize_embeddings=True)
   return embedding.tolist()
@@ -57,20 +56,20 @@ class Document:
   created_at: datetime.datetime
 
   @staticmethod
-  def from_tuple(t: tuple) -> "Document":
+  def from_tuple(t: tuple):
     return Document(t[0], t[1], t[2], t[3])
 
-  def __dict__(self) -> dict:
+  def __dict__(self):
     return asdict(self)
 
-def get_documents() -> list[Document]:
+def get_documents():
   """Get all documents from the database."""
   with conn.cursor() as cursor:
     cursor.execute("SELECT * FROM documents;")
     documents = cursor.fetchall()
   return list(map(Document.from_tuple, documents))
 
-def create_document(title: str, content: str) -> None:
+def create_document(title: str, content: str):
   """Insert document into database."""
   chunks = chunk_text(content)
   embeddings = map(embed_text, chunks)
@@ -89,14 +88,14 @@ def create_document(title: str, content: str) -> None:
           """, (doc_id, i, chunk, embedding))
     conn.commit()
 
-def get_document(id: int) -> Optional[Document]:
+def get_document(id: int):
   """Get one document from the database."""
   with conn.cursor() as cursor:
     cursor.execute("SELECT * FROM documents WHERE id = %s;", (id,))
     document = cursor.fetchone()
   return Document.from_tuple(document) if document else None
 
-def update_document(id: int, title: str, content: str) -> None:
+def update_document(id: int, title: str, content: str):
   """Update a document in the database."""
   chunks = chunk_text(content)
   embeddings = map(embed_text, chunks)
@@ -117,7 +116,7 @@ def update_document(id: int, title: str, content: str) -> None:
         """, (id, i, chunk, embedding))
     conn.commit()
 
-def delete_document(id: int) -> None:
+def delete_document(id: int):
   """Delete a document from the database."""
   with conn.cursor() as cursor:
     cursor.execute("DELETE FROM document_chunks where doc_id = %s;", (id,))
@@ -131,13 +130,13 @@ class Chunk:
   similarity: float
 
   @staticmethod
-  def from_tuple(t: tuple) -> "Chunk":
+  def from_tuple(t: tuple):
     return Chunk(t[0], t[1])
 
-  def __dict__(self) -> dict:
+  def __dict__(self):
     return asdict(self)
 
-def search_chunks(query: str, top_k: int) -> list[Chunk]:
+def search_chunks(query: str, top_k: int):
   """Get top-k chunks matching query."""
   embedding = embed_text(query)
   with conn.cursor() as cursor:

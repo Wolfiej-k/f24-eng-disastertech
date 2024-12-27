@@ -96,10 +96,8 @@ export default function ChatBox() {
         body: JSON.stringify({ query: query }),
       });
 
-      if (!response.body) {
-        message.content = "Query failed. Please try again.";
-        updateRecent(message);
-        return;
+      if (!response.ok || !response.body) {
+        throw Error("Query failed");
       }
 
       const reader = response.body.getReader();
@@ -112,12 +110,13 @@ export default function ChatBox() {
           break;
         }
 
-        const chunk = decoder.decode(value, { stream: true });
-        const json = JSON.parse(chunk);
-        buffer += json.content ?? "";
-
+        buffer += decoder.decode(value, { stream: true });
         message.content = buffer;
         updateRecent(message);
+      }
+
+      if (buffer == "") {
+        throw Error("Query failed");
       }
     } catch {
       message.content = "Query failed. Please try again.";

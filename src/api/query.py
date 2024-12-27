@@ -1,33 +1,52 @@
 import requests
-from typing import Generator, Optional
+import json
 
 from documents import search_chunks
 
 LLAMA_URL = "http://llama:8080"
-CHUNK_SIZE = 512
-MAX_TOKENS = 128
+SYSTEM_PROMPT = "You assist people in natural disaster zones who have limited access to information. " + \
+                "Using the following documents, answer their questions about survival in various " + \
+                "scenarios. If you do not know how to respond to a prompt, say \"I'm not sure\" " + \
+                "and stop immediately. Never fabricate information not present in the documents. " + \
+                "Your response should be formatted for plain-text without markdown."
 
-def build_prompt(query: str, top_k=5) -> Optional[str]:
+def build_context(query: str, top_k=5):
   """Augment query with vector documents."""
-  context = "\n".join([chunk.text for chunk in search_chunks(query, top_k)])
-  return f"Context:\n{context}\n\nQuestion: {query}\nAnswer:"
+  prompt = SYSTEM_PROMPT + " "
+  for i, chunk in enumerate(search_chunks(query, top_k)):
+    context += f"Document {i}: {chunk.text} "
 
-def stream_llama(prompt) -> Generator[str, None, None]:
+  return [
+    {"role": "system", "content": prompt},
+    {"role": "user", "content": query},
+  ]
+
+def stream_llama(context: list[dict], max_tokens=128):
   """Complete query text using llama.cpp's stream API."""
-  yield ""
-
   try:
     response = requests.post(
-      f"{LLAMA_URL}/completion",
-      json={"prompt": prompt, "max_tokens": MAX_TOKENS},
+      f"{LLAMA_URL}/v1/chat/completions",
+      json={
+        "messages": context,
+        "max_tokens": max_tokens,
+        "stream": True,
+      },
       stream=True
     )
 
     if not response.ok:
       yield "Error: Unable to complete request."
 
-    for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-      if chunk:
-        yield chunk.decode('utf-8')
-  except requests.exceptions.RequestException as e:
+    for line in response.iter_lines(decode_unicode=True):
+      if line and line.startswith("data: "):
+        data_str = line[len("data: "):]
+        if data_str == "[DONE]":
+          break
+
+        data = json.loads(data_str)
+        content = data["choices"][0]["delta"].get("content", "")
+        if content:
+          yield content
+
+  except Exception as e:
     yield f"Error: {str(e)}"

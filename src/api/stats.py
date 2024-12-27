@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 containers = ["frontend", "backend", "llama", "database"]
 client = docker.from_env()
 
-def get_stats(name: str) -> dict:
+def get_stats(name: str):
   """Get essential stats for a Docker container."""
   container = client.containers.get(name)
   stats = container.stats(stream=False)
@@ -43,7 +43,7 @@ def get_stats(name: str) -> dict:
     }
   }
 
-def container_stats() -> dict:
+def container_stats():
   """Get stats for four primary containers."""
   stats = {container: get_stats(container) for container in containers}
 
@@ -59,7 +59,7 @@ def container_stats() -> dict:
     "containers": stats
   }
 
-def container_health() -> dict:
+def container_health():
   """Ensure primary containers are running and healthy."""
   health = {
     "status": "healthy",
