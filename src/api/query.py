@@ -10,16 +10,25 @@ SYSTEM_PROMPT = "You assist people in natural disaster zones who have limited ac
                 "and stop immediately. Never fabricate information not present in the documents. " + \
                 "Your response should be formatted for plain-text without markdown."
 
-def build_context(query: str, top_k=5):
+def parse_message(message: dict):
+  """Parse message object."""
+  return {
+    "role": "user" if message["type"] == "query" else "assistant",
+    "content": message["content"],
+  }
+
+def build_context(query: str, history: list[dict], top_docs=5, top_hist=10):
   """Augment query with vector documents."""
   prompt = SYSTEM_PROMPT + " "
-  for i, chunk in enumerate(search_chunks(query, top_k)):
+  for i, chunk in enumerate(search_chunks(query, top_docs), 1):
     prompt += f"Document {i}: {chunk.text} "
 
-  return [
-    {"role": "system", "content": prompt},
-    {"role": "user", "content": query},
-  ]
+  context = [{"role": "system", "content": prompt}]
+  for message in history[-top_hist:]:
+    context.append(parse_message(message))
+  context.append({"role": "user", "content": query})
+
+  return context
 
 def stream_llama(context: list[dict], max_tokens=128):
   """Complete query text using llama.cpp's stream API."""

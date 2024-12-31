@@ -94,7 +94,10 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ query: query }),
+        body: JSON.stringify({
+          query: query,
+          history: history,
+        }),
       });
 
       if (!response.ok || !response.body) {

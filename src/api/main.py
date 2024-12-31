@@ -14,7 +14,13 @@ def handle_documents():
     return jsonify(get_documents()), HTTPStatus.OK
   elif request.method == "POST":
     data = request.get_json()
-    create_document(data.get("title"), data.get("content"))
+    title = data.get("title")
+    content = data.get("content")
+
+    if not title or not content:
+      return "", HTTPStatus.BAD_REQUEST
+
+    create_document(title, content)
     return "", HTTPStatus.CREATED
 
 @app.route("/documents/<int:id>", methods=["GET", "PUT", "DELETE"])
@@ -27,7 +33,13 @@ def handle_document(id: int):
     return jsonify(document), HTTPStatus.OK
   elif request.method == "PUT":
     data = request.get_json()
-    update_document(id, data.get("title"), data.get("content"))
+    title = data.get("title")
+    content = data.get("content")
+
+    if not title or not content:
+      return "", HTTPStatus.BAD_REQUEST
+
+    update_document(id, title, content)
     return "", HTTPStatus.OK
   elif request.method == "DELETE":
     delete_document(id)
@@ -36,8 +48,15 @@ def handle_document(id: int):
 @app.route("/query", methods=["POST"])
 def handle_query():
   data = request.get_json()
-  context = build_context(data.get("query"))
+  query = data.get("query")
+  history = data.get("history", [])
+
+  if not data.get("query"):
+    return "", HTTPStatus.BAD_REQUEST
+
+  context = build_context(query, history)
   stream = stream_llama(context)
+
   return Response(
     stream_with_context(stream),
     content_type='text/plain'
