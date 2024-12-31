@@ -14,7 +14,7 @@ def build_context(query: str, top_k=5):
   """Augment query with vector documents."""
   prompt = SYSTEM_PROMPT + " "
   for i, chunk in enumerate(search_chunks(query, top_k)):
-    context += f"Document {i}: {chunk.text} "
+    prompt += f"Document {i}: {chunk.text} "
 
   return [
     {"role": "system", "content": prompt},

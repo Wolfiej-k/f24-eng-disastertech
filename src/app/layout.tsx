@@ -1,10 +1,11 @@
+import { Navbar } from "@/components/ui/navbar";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Offline AI",
-  description: "T4SG / Disaster Tech Labs",
+  description: "T4SG × Disaster Tech Labs",
 };
 
 export default function RootLayout({
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans">
+        <Navbar />
         <main>{children}</main>
         <Toaster />
       </body>
