@@ -38,7 +38,7 @@ export default function Stats() {
         }
         const data = await response.json();
         setStats(data);
-      } catch (error) {
+      } catch {
         setError(true);
       } finally {
         setLoading(false);
