@@ -3,6 +3,7 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CircleUser } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./button";
 
@@ -16,12 +17,12 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-primary px-2 py-1">
+    <nav className="fixed left-0 top-0 z-10 w-full bg-primary px-2 py-1">
       <div className="flex items-center justify-between bg-primary px-6 py-4">
         <div className="flex items-center">
-          <a href="/">
+          <Link href="/">
             <Image src="/logo.png" alt="Disaster Tech Lab Logo" width="64" height="64" className="mr-4" />
-          </a>
+          </Link>
           <h1 className="text-2xl font-bold text-white">
             Offline AI
             <span className="mx-4 border-l border-r border-white"></span>
@@ -32,12 +33,12 @@ export function Navbar() {
           <ul className="flex space-x-4">
             {Object.entries(routes).map(([route, title]) => (
               <li key={route}>
-                <a
+                <Link
                   href={route}
                   className={`text-white transition-colors hover:text-gray-200 ${route == pathname ? "underline underline-offset-4" : ""}`}
                 >
                   {title}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

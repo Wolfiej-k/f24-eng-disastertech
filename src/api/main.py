@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response, stream_with_context
 from http import HTTPStatus
 import os
+import json
 
 from documents import get_documents, create_document, get_document, update_document, delete_document
 from query import build_context, stream_llama
@@ -54,13 +55,16 @@ def handle_query():
   if not data.get("query"):
     return "", HTTPStatus.BAD_REQUEST
 
-  context = build_context(query, history)
+  context, doc_ids = build_context(query, history)
   stream = stream_llama(context)
 
-  return Response(
+  response = Response(
     stream_with_context(stream),
     content_type='text/plain'
   )
+  response.headers["X-Query-Sources"] = json.dumps(doc_ids)
+
+  return response
 
 @app.route("/stats", methods=["GET"])
 def handle_stats():

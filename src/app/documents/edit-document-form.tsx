@@ -64,7 +64,7 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
     <div className="flex flex-row">
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="ghost">
             <Pencil />
           </Button>
         </DialogTrigger>

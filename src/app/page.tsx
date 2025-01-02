@@ -49,11 +49,11 @@ export default function HomePage() {
     const storedJson = localStorage.getItem("messageHistory");
     const storedHistory = storedJson ? JSON.parse(storedJson) : [];
 
-    if (storedHistory) {
+    if (storedHistory.length > 0) {
       setHistory(storedHistory);
     } else {
       pushHistory({
-        content: "Hi! How can I help you?",
+        content: "Welcome to Offline AI! How can I help you?",
         type: "response",
         time: new Date(),
       });
@@ -101,13 +101,18 @@ export default function HomePage() {
       });
 
       if (!response.ok || !response.body) {
-        throw Error("Query failed");
+        throw Error("No response");
+      }
+
+      const sources = response.headers.get("X-Query-Sources");
+      if (sources) {
+        message.sources = JSON.parse(sources);
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = "";
 
+      let buffer = "";
       while (true) {
         const { value, done } = await reader.read();
         if (done) {
@@ -120,9 +125,10 @@ export default function HomePage() {
       }
 
       if (buffer == "") {
-        throw Error("Query failed");
+        throw Error("Response empty");
       }
-    } catch {
+    } catch (err) {
+      console.log(err);
       message.content = "Query failed. Please try again.";
       updateRecent(message);
     }

@@ -29,6 +29,9 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - API_PORT=4000
+      - TOP_DOCUMENTS=5
+      - TOP_HISTORY=10
+      - MAX_TOKENS=128
     volumes:
       - ./src/api:/api/src/api
       - /var/run/docker.sock:/var/run/docker.sock

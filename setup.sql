@@ -13,16 +13,25 @@ CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    searches INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Chunks table with pgvector embeddings for retrieval
+-- Chunks table with pgvector embeddings
 CREATE TABLE document_chunks (
     id SERIAL PRIMARY KEY,
     doc_id INTEGER REFERENCES documents(id) ON DELETE CASCADE,
     chunk_index INTEGER NOT NULL,
     chunk_text TEXT NOT NULL,
     embedding vector(384)  -- Adjust size to match your model
+);
+
+-- Logs of all past queries
+CREATE TABLE query_logs (
+  id SERIAL PRIMARY KEY,
+  query TEXT NOT NULL,
+  response TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Search heuristic (compare with HNSW)

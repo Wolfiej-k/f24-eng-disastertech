@@ -43,7 +43,7 @@ export default function AddDocumentForm() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="ghost">
           <PlusCircle />
         </Button>
       </DialogTrigger>

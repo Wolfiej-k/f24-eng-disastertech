@@ -1,9 +1,8 @@
 "use client";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { TypographyP } from "@/components/ui/typography";
 import { useEffect, useState } from "react";
 import AddDocumentForm from "./add-document-form";
-import EditDocumentForm from "./edit-document-form";
+import DocumentCard from "./document-card";
 import { Document } from "./schema";
 
 export default function DocumentsPage() {
@@ -48,35 +47,9 @@ export default function DocumentsPage() {
       <div className="absolute right-0 p-4">
         <AddDocumentForm />
       </div>
-      <div className="grid grid-cols-1 gap-4 px-24 py-6">
-        {documents.map((doc) => (
-          <Card key={doc.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                {doc.title}
-                <div className="flex justify-end">
-                  <EditDocumentForm document={doc} />
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TypographyP>{doc.content}</TypographyP>
-            </CardContent>
-            <CardFooter>
-              <div className="pt-1 text-xs text-gray-500">
-                {new Date(doc.created_at)
-                  .toLocaleTimeString([], {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                  .split("T")
-                  .join(", ")}
-              </div>
-            </CardFooter>
-          </Card>
+      <div className="grid grid-cols-1 gap-4 px-24 py-8">
+        {documents.map((document) => (
+          <DocumentCard key={document.id} document={document} editable={true} />
         ))}
       </div>
     </>

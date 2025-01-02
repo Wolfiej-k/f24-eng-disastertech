@@ -15,9 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans">
+      <body className="h-screen overflow-hidden font-sans">
         <Navbar />
-        <main>{children}</main>
+        <main className="h-full overflow-auto pt-24">{children}</main>
         <Toaster />
       </body>
     </html>

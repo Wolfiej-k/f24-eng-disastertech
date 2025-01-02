@@ -53,11 +53,12 @@ class Document:
   id: int
   title: str
   content: str
+  searches: int
   created_at: datetime.datetime
 
   @staticmethod
   def from_tuple(t: tuple):
-    return Document(t[0], t[1], t[2], t[3])
+    return Document(t[0], t[1], t[2], t[3], t[4])
 
   def __dict__(self):
     return asdict(self)
@@ -86,6 +87,7 @@ def create_document(title: str, content: str):
             INSERT INTO document_chunks (doc_id, chunk_index, chunk_text, embedding)
             VALUES (%s, %s, %s, %s);
           """, (doc_id, i, chunk, embedding))
+
     conn.commit()
 
 def get_document(id: int):
@@ -114,6 +116,7 @@ def update_document(id: int, title: str, content: str):
           INSERT INTO document_chunks (doc_id, chunk_index, chunk_text, embedding)
           VALUES (%s, %s, %s, %s);
         """, (id, i, chunk, embedding))
+
     conn.commit()
 
 def delete_document(id: int):
@@ -128,10 +131,11 @@ class Chunk:
   """Chunk of text and similarity to query."""
   text: str
   similarity: float
+  doc_id: int
 
   @staticmethod
   def from_tuple(t: tuple):
-    return Chunk(t[0], t[1])
+    return Chunk(t[0], t[1], t[2])
 
   def __dict__(self):
     return asdict(self)
@@ -141,10 +145,28 @@ def search_chunks(query: str, top_k: int):
   embedding = embed_text(query)
   with conn.cursor() as cursor:
     cursor.execute("""
-      SELECT chunk_text, embedding <#> %s::vector AS similarity
-      FROM document_chunks
-      ORDER BY similarity DESC
-      LIMIT %s;
-    """, (embedding, top_k))
+        SELECT chunk_text, embedding <#> %s::vector AS similarity, doc_id
+        FROM document_chunks
+        ORDER BY similarity DESC
+        LIMIT %s;
+      """, (embedding, top_k))
     results = cursor.fetchall()
   return list(map(Chunk.from_tuple, results))
+
+def update_chunks(doc_ids: list[int]):
+  """Increment search counter for documents."""
+  with conn.cursor() as cursor:
+    cursor.execute("""
+        UPDATE documents SET searches = searches + 1
+        WHERE id = ANY(%s);
+      """, (doc_ids,))
+    conn.commit()
+
+def log_query(query: str, response: str):
+  """Log query and response in the database."""
+  with conn.cursor() as cursor:
+    cursor.execute("""
+        INSERT INTO query_logs (query, response)
+        VALUES (%s, %s);
+      """, (query,response))
+    conn.commit()
