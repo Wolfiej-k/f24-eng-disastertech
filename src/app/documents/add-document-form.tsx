@@ -44,7 +44,7 @@ export default function AddDocumentForm() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="ghost" className="text-lg">
-          <PlusCircle /> Add Document
+          <PlusCircle /> <span>&nbsp;</span>Add Document
         </Button>
       </DialogTrigger>
       <DialogContent>
