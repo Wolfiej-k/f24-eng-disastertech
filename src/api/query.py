@@ -21,8 +21,8 @@ def build_context(query: str, history: list[dict]):
   update_chunks(doc_ids)
 
   prompt = SYSTEM_PROMPT + " "
-  for i, chunk in enumerate(chunks, 1):
-    prompt += f"Document {i}: {chunk.text} "
+  for chunk in chunks:
+    prompt += f"Document {chunk.doc_id}: {chunk.text} "
 
   context = [{"role": "system", "content": prompt}]
   for message in history[-TOP_HISTORY:]:
