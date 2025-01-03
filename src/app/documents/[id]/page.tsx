@@ -17,7 +17,7 @@ export default async function DocumentPage({ params }: { params: { id: string } 
 
   const document = (await response.json()) as Document;
   return (
-    <div className="px-24 py-8">
+    <div className="p-6">
       <DocumentCard document={document} editable={false} />
     </div>
   );

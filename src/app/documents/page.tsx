@@ -47,7 +47,7 @@ export default function DocumentsPage() {
       <div className="absolute right-0 p-4">
         <AddDocumentForm />
       </div>
-      <div className="grid grid-cols-1 gap-4 px-24 py-8">
+      <div className="grid grid-cols-1 gap-4 p-6">
         {documents.map((document) => (
           <DocumentCard key={document.id} document={document} editable={true} />
         ))}

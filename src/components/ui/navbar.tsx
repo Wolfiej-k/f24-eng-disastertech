@@ -23,7 +23,7 @@ export function Navbar() {
           <Link href="/">
             <Image src="/logo.png" alt="Disaster Tech Lab Logo" width="64" height="64" className="mr-4" />
           </Link>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="hidden text-2xl font-bold text-white lg:block">
             Offline AI
             <span className="mx-4 border-l border-r border-white"></span>
             Disaster Tech Lab
