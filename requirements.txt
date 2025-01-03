@@ -5,3 +5,5 @@ docker>=6.1.0
 requests>=2.31.0
 psutil>=5.9.0
 numpy==2.0.0
+flask_bcrypt
+flask_jwt_extended

@@ -7,9 +7,7 @@ from documents import Chunk, search_chunks, update_chunks, log_query
 LLAMA_URL = "http://llama:8080"
 SYSTEM_PROMPT = "You assist people in natural disaster zones who have limited access to information. " + \
                 "Using the following documents, answer their questions about survival in various " + \
-                "scenarios. If you do not know how to respond to a prompt, say \"I'm not sure\" " + \
-                "and stop immediately. Never fabricate information not present in the documents. " + \
-                "Your response should be formatted for plain-text without markdown."
+                "scenarios. Your response should be formatted for plain-text without markdown."
 TOP_DOCUMENTS = int(os.getenv("TOP_DOCUMENTS", 5))
 TOP_HISTORY = int(os.getenv("TOP_HISTORY", 10))
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", 128))
