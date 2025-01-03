@@ -22,32 +22,32 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         <ChatBubbleMessage isLoading={!message.content}>
           {message.content}
           <div className={`mt-1 text-xs ${isQuery ? "text-gray-200" : "text-gray-500"}`}>
+            {time
+              .toLocaleTimeString([], {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              .split("T")
+              .join(", ")}
             {message.sources && message.sources.length > 0 && (
-              <span className="text-xs text-gray-500">
-                Sources:
+              <span>
+                , Sources:
                 {message.sources.map((source) => (
-                  <Link
-                    key={source}
-                    className="inline-flex items-center rounded-full bg-blue-100 py-0.5 pl-3 text-xs font-medium text-blue-800"
-                    href={`/documents/${source}`}
-                  >
-                    {source}
-                  </Link>
+                  <span className="ml-1">
+                    <Link
+                      key={source}
+                      className="inline-flex items-center rounded-full bg-blue-100 p-1 text-xs font-medium text-blue-800"
+                      href={`/documents/${source}`}
+                    >
+                      {source}
+                    </Link>
+                  </span>
                 ))}
               </span>
             )}
-            <p className="mt-1">
-              {time
-                .toLocaleTimeString([], {
-                  year: "numeric",
-                  month: "numeric",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-                .split("T")
-                .join(", ")}
-            </p>
           </div>
         </ChatBubbleMessage>
       </ChatBubble>
