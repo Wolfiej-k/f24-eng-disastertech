@@ -43,15 +43,15 @@ export default function DocumentsPage() {
   }
 
   return (
-    <>
-      <div className="absolute right-0 p-4">
+    <div className="p-6">
+      <div className="mb-3 flex justify-center">
         <AddDocumentForm />
       </div>
-      <div className="grid grid-cols-1 gap-4 p-6">
+      <div className="grid grid-cols-1 gap-4">
         {documents.map((document) => (
           <DocumentCard key={document.id} document={document} editable={true} />
         ))}
       </div>
-    </>
+    </div>
   );
 }

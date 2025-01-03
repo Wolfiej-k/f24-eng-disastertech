@@ -90,7 +90,7 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
                 {...register("content")}
                 className="mt-1 block w-full"
                 placeholder="Content"
-                rows={4}
+                rows={12}
               />
               {errors.content && (
                 <TypographyP className="mt-1 text-sm text-red-500">{errors.content.message}</TypographyP>

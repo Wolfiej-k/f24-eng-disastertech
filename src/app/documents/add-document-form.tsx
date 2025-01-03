@@ -43,8 +43,8 @@ export default function AddDocumentForm() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost">
-          <PlusCircle />
+        <Button variant="ghost" className="text-lg">
+          <PlusCircle /> Add Document
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -69,7 +69,7 @@ export default function AddDocumentForm() {
               {...register("content")}
               className="mt-1 block w-full"
               placeholder="Content"
-              rows={4}
+              rows={12}
             />
             {errors.content && (
               <TypographyP className="mt-1 text-sm text-red-500">{errors.content.message}</TypographyP>

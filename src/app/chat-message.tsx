@@ -36,9 +36,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               <span>
                 , Sources:
                 {message.sources.map((source) => (
-                  <span className="ml-1">
+                  <span key={source} className="ml-1">
                     <Link
-                      key={source}
                       className="inline-flex items-center rounded-full bg-blue-100 p-1 text-xs font-medium text-blue-800"
                       href={`/documents/${source}`}
                     >
