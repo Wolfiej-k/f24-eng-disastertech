@@ -2,7 +2,8 @@ import requests
 import json
 import os
 
-from documents import Chunk, search_chunks, update_chunks, log_query
+from documents import search_chunks, update_chunks
+from database import get_database
 
 LLAMA_URL = "http://llama:8080"
 SYSTEM_PROMPT = "You assist people in natural disaster zones who have limited access to information. " + \
@@ -31,6 +32,15 @@ def build_context(query: str, history: list[dict]):
   context.append({"role": "user", "content": query})
 
   return context, doc_ids
+
+def log_query(query: str, response: str):
+  """Log query and response in the database."""
+  with get_database() as conn:
+    with conn.cursor() as cursor:
+      cursor.execute("""
+          INSERT INTO queries (query, response)
+          VALUES (%s, %s);
+        """, (query,response))
 
 def stream_llama(context: list[dict]):
   """Complete query text using llama.cpp's stream API."""
