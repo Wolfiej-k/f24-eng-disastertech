@@ -139,9 +139,13 @@ def search_chunks(query: str, top_k: int):
   conn = get_database()
   with conn.cursor() as cursor:
     cursor.execute("""
-        SELECT chunk_text, embedding <#> %s::vector AS similarity, doc_id
-        FROM document_chunks
-        ORDER BY similarity DESC
+        SELECT chunk_text, similarity, doc_id
+        FROM (
+          SELECT chunk_text, embedding <#> %s::vector AS similarity, doc_id
+          FROM document_chunks
+        ) subquery
+        WHERE similarity <= -0.5
+        ORDER BY similarity ASC
         LIMIT %s;
       """, (embedding, top_k))
     results = cursor.fetchall()

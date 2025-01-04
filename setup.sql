@@ -39,6 +39,3 @@ CREATE TABLE document_chunks (
   chunk_text TEXT NOT NULL,
   embedding vector(384)  -- Adjust size to match model
 );
-
--- Search heuristic (compare with HNSW)
-CREATE INDEX ON document_chunks USING ivfflat (embedding vector_ip_ops)
