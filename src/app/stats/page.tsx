@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TypographyP } from "@/components/ui/typography";
-import { getUser } from "@/lib/auth";
+import { getUser, refreshUser } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, Tooltip as RechartsTooltip } from "recharts";
 
@@ -25,7 +25,7 @@ interface Stats {
 
 const COLORS = ["#9CAF88", "#d3d3d3"];
 
-export default function Stats() {
+export default function StatsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -39,6 +39,10 @@ export default function Stats() {
             Authorization: `Bearer ${user?.access}`,
           },
         });
+
+        if (response.status == 401 && (await refreshUser())) {
+          return await fetchStats();
+        }
 
         if (!response.ok) {
           throw new Error("Failed to fetch stats");

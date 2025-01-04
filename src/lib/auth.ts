@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-interface User {
+export interface User {
   username: string;
   access: string;
   refresh: string;
@@ -48,7 +48,7 @@ export async function getUser() {
 export async function refreshUser() {
   let user = await getUser();
   if (!user) {
-    redirect("/");
+    return null;
   }
 
   const { username, refresh } = user;

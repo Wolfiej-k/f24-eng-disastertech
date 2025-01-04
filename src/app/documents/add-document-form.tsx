@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyP } from "@/components/ui/typography";
-import { getUser } from "@/lib/auth";
+import { getUser, refreshUser } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -30,6 +30,10 @@ export default function AddDocumentForm() {
       },
       body: JSON.stringify(data),
     });
+
+    if (response.status == 401 && (await refreshUser())) {
+      return await onSubmit(data);
+    }
 
     if (!response.ok) {
       throw new Error("Failed to add document!");

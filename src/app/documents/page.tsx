@@ -1,6 +1,6 @@
 "use client";
 import { TypographyP } from "@/components/ui/typography";
-import { getUser } from "@/lib/auth";
+import { getUser, refreshUser } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import AddDocumentForm from "./add-document-form";
 import DocumentCard from "./document-card";
@@ -20,6 +20,10 @@ export default function DocumentsPage() {
           Authorization: `Bearer ${user?.access}`,
         },
       });
+
+      if (response.status == 401 && (await refreshUser())) {
+        return await fetchDocuments();
+      }
 
       if (!response.ok) {
         setError(true);

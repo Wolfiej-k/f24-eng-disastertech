@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyP } from "@/components/ui/typography";
 import { toast } from "@/hooks/toast";
-import { getUser } from "@/lib/auth";
+import { getUser, refreshUser } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -37,6 +37,10 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
       body: JSON.stringify(data),
     });
 
+    if (response.status == 401 && (await refreshUser())) {
+      return await onSubmit(data);
+    }
+
     if (!response.ok) {
       return toast({
         title: "Error!",
@@ -57,6 +61,10 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
         Authorization: `Bearer ${user?.access}`,
       },
     });
+
+    if (response.status == 401 && (await refreshUser())) {
+      return await onDelete();
+    }
 
     if (!response.ok) {
       return toast({
