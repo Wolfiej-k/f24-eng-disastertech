@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, verify_jwt_in_request
 from http import HTTPStatus
 import psycopg2
 import os
@@ -22,24 +22,24 @@ jwt = JWTManager(app)
 def handle_register():
   secret = request.headers.get("X-Secret")
   if not secret or secret != ADMIN_SECRET:
-    return jsonify({"message": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
+    return jsonify({"msg": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
 
   data = request.get_json()
   username = data.get("username")
   password = data.get("password")
   if not username or not password:
-    return jsonify({"message": "Username and password required"}), HTTPStatus.BAD_REQUEST
+    return jsonify({"msg": "Missing username or password"}), HTTPStatus.BAD_REQUEST
 
   hash = bcrypt.generate_password_hash(password).decode('utf-8')
   try:
     with get_database() as conn:
       with conn.cursor() as cursor:
         cursor.execute("INSERT INTO users (username, hash) VALUES (%s, %s)", (username, hash))
-    return jsonify({"message": "User registered"}), HTTPStatus.CREATED
+    return jsonify({"msg": "User registered"}), HTTPStatus.CREATED
   except psycopg2.IntegrityError:
-    return jsonify({"message": "User already exists"}), HTTPStatus.CONFLICT
+    return jsonify({"msg": "User already exists"}), HTTPStatus.CONFLICT
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route("/login", methods=["POST"])
 def handle_login():
@@ -47,7 +47,7 @@ def handle_login():
   username = data.get("username")
   password = data.get("password")
   if not username or not password:
-    return jsonify({"message": "Username and password required"}), HTTPStatus.BAD_REQUEST
+    return jsonify({"msg": "Missing username or password"}), HTTPStatus.BAD_REQUEST
 
   try:
     conn = get_database()
@@ -57,11 +57,12 @@ def handle_login():
       if hash and bcrypt.check_password_hash(hash[0], password):
         token = create_access_token(identity={"username": username})
         return jsonify({"token": token}), HTTPStatus.OK
-      return jsonify({"message": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
+      return jsonify({"msg": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route("/documents", methods=["GET", "POST"])
+@jwt_required()
 def handle_documents():
   try:
     if request.method == "GET":
@@ -71,36 +72,43 @@ def handle_documents():
       title = data.get("title")
       content = data.get("content")
       if not title or not content:
-        return jsonify({"message": "Title and content required"}), HTTPStatus.BAD_REQUEST
+        return jsonify({"msg": "Missing title or content"}), HTTPStatus.BAD_REQUEST
 
       create_document(title, content)
-      return jsonify({"message": "Document created"}), HTTPStatus.CREATED
+      return jsonify({"msg": "Document created"}), HTTPStatus.CREATED
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route("/documents/<int:id>", methods=["GET", "PUT", "DELETE"])
 def handle_document(id: int):
   try:
     document = get_document(id)
     if not document:
-      return jsonify({"message": "Document not found"}), HTTPStatus.NOT_FOUND
+      return jsonify({"msg": "Document not found"}), HTTPStatus.NOT_FOUND
 
     if request.method == "GET":
       return jsonify(document), HTTPStatus.OK
-    elif request.method == "PUT":
+
+    try:
+      verify_jwt_in_request()
+    except:
+      return jsonify({"msg": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
+
+    if request.method == "PUT":
       data = request.get_json()
       title = data.get("title")
       content = data.get("content")
       if not title or not content:
-        return jsonify({"message": "Title and content required"}), HTTPStatus.BAD_REQUEST
+        return jsonify({"msg": "Missing title or content"}), HTTPStatus.BAD_REQUEST
 
       update_document(id, title, content)
-      return jsonify({"message": "Document updated"}), HTTPStatus.OK
-    elif request.method == "DELETE":
+      return jsonify({"msg": "Document updated"}), HTTPStatus.OK
+
+    if request.method == "DELETE":
       delete_document(id)
-      return jsonify({"message": "Document deleted"}), HTTPStatus.OK
+      return jsonify({"msg": "Document deleted"}), HTTPStatus.OK
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route("/query", methods=["POST"])
 def handle_query():
@@ -108,7 +116,7 @@ def handle_query():
   query = data.get("query")
   history = data.get("history", [])
   if not query:
-    return jsonify({"message": "Query required"}), HTTPStatus.BAD_REQUEST
+    return jsonify({"msg": "Missing query"}), HTTPStatus.BAD_REQUEST
 
   try:
     context, doc_ids = build_context(query, history)
@@ -117,21 +125,23 @@ def handle_query():
     response.headers["X-Query-Sources"] = json.dumps(doc_ids)
     return response
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route("/stats", methods=["GET"])
+@jwt_required()
 def handle_stats():
   try:
     return jsonify(container_stats()), HTTPStatus.OK
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route("/health", methods=["GET"])
+@jwt_required()
 def handle_health():
   try:
     return jsonify(container_health()), HTTPStatus.OK
   except:
-    return jsonify({"message": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=os.getenv("API_PORT"))
