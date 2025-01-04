@@ -24,12 +24,13 @@ services:
     container_name: backend
     environment:
       - POSTGRES_USER=t4sg
-      - POSTGRES_PASSWORD=disaster-tech-labs
+      - POSTGRES_PASSWORD=disaster-tech-lab
       - POSTGRES_DB=offline-ai
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - API_PORT=4000
-      - ADMIN_SECRET=secret
+      - AUTH_SECRET=${AUTH_SECRET}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - TOP_DOCUMENTS=5
       - TOP_HISTORY=10
       - MAX_TOKENS=128
@@ -61,7 +62,7 @@ services:
     image: pgvector/pgvector:pg17
     container_name: database
     environment:
-      - POSTGRES_PASSWORD=disaster-tech-labs
+      - POSTGRES_PASSWORD=disaster-tech-lab
       - POSTGRES_DB=offline-ai
       - POSTGRES_HOST=postgres
     volumes:

@@ -11,9 +11,11 @@ from query import build_context, stream_llama
 from stats import container_stats, container_health
 from database import get_database
 
+AUTH_SECRET = os.getenv("AUTH_SECRET")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
 app = Flask(__name__)
-ADMIN_SECRET = os.getenv("ADMIN_SECRET")
-app.config["JWT_SECRET_KEY"] = ADMIN_SECRET
+app.config["JWT_SECRET_KEY"] = AUTH_SECRET
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -21,7 +23,7 @@ jwt = JWTManager(app)
 @app.route("/register", methods=["POST"])
 def handle_register():
   secret = request.headers.get("X-Secret")
-  if not secret or secret != ADMIN_SECRET:
+  if not secret or secret != ADMIN_PASSWORD:
     return jsonify({"msg": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
 
   data = request.get_json()

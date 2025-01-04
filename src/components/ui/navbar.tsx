@@ -1,20 +1,62 @@
 "use client";
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { TypographyP } from "@/components/ui/typography";
+import type { User } from "@/lib/auth";
+import { loginUser } from "@/lib/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleUser } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "./button";
 
-const routes = {
-  "/": "Home",
-  "/documents": "Documents",
-  "/stats": "Stats",
-};
+interface NavbarProps {
+  user: User | null;
+}
 
-export function Navbar() {
+const schema = z.object({
+  username: z.string().min(1, "Username is required."),
+  password: z.string().min(1, "Password is required."),
+});
+
+type FormData = z.infer<typeof schema>;
+
+export function Navbar({ user }: NavbarProps) {
+  const [error, setError] = useState<string | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const routes = new Map<string, string>();
+  routes.set("/", "Home");
+
+  if (user) {
+    routes.set("/documents", "Documents");
+    routes.set("/stats", "Stats");
+  }
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async ({ username, password }: FormData) => {
+    const user = await loginUser(username, password);
+    if (!user) {
+      setError("Invalid credentials.");
+    }
+
+    router.refresh();
+  };
 
   return (
     <nav className="fixed left-0 top-0 z-10 w-full bg-primary px-2 py-1">
@@ -31,7 +73,7 @@ export function Navbar() {
         </div>
         <div className="flex items-center">
           <ul className="flex space-x-4">
-            {Object.entries(routes).map(([route, title]) => (
+            {[...routes.entries()].map(([route, title]) => (
               <li key={route}>
                 <Link
                   href={route}
@@ -43,20 +85,71 @@ export function Navbar() {
             ))}
           </ul>
           <div className="mu-2 relative ml-6 mt-1">
-            <Popover>
-              <PopoverTrigger>
-                <CircleUser size={24} className="text-white hover:text-gray-200" />
-              </PopoverTrigger>
-              <PopoverContent>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-sm text-gray-500">john@example.com</p>
+            {user ? (
+              <Popover>
+                <PopoverTrigger>
+                  <CircleUser size={24} className="text-white hover:text-gray-200" />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium">John Doe</p>
+                      <p className="text-sm text-gray-500">john@example.com</p>
+                    </div>
+                    <Button variant="destructive">Log Out</Button>
                   </div>
-                  <Button variant="destructive">Log Out</Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <Dialog>
+                <DialogTrigger>
+                  <CircleUser size={24} className="text-white hover:text-gray-200" />
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Log In</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div>
+                      <label htmlFor="username" className="block text-sm font-medium">
+                        Username
+                      </label>
+                      <Input
+                        id="username"
+                        {...register("username")}
+                        className="mt-1 block w-full"
+                        placeholder="Username"
+                      />
+                      {errors.username && (
+                        <TypographyP className="mt-1 text-sm text-red-500">{errors.username.message}</TypographyP>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="password" className="block text-sm font-medium">
+                        Password
+                      </label>
+                      <Input
+                        id="password"
+                        {...register("password")}
+                        className="mt-1 block w-full"
+                        placeholder="Password"
+                        type="password"
+                      />
+                      {errors.password && (
+                        <TypographyP className="mt-1 text-sm text-red-500">{errors.password.message}</TypographyP>
+                      )}
+                    </div>
+                    <div>{error && <TypographyP className="mt-1 text-sm text-red-500">{error}</TypographyP>}</div>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="ghost" type="button" onClick={() => reset()}>
+                        Reset
+                      </Button>
+                      <Button type="submit">Submit</Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/ui/navbar";
 import { Toaster } from "@/components/ui/toaster";
+import { getUser } from "@/lib/auth";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -8,15 +9,16 @@ export const metadata: Metadata = {
   description: "T4SG × Disaster Tech Labs",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUser();
   return (
     <html lang="en">
       <body className="h-screen overflow-hidden font-sans">
-        <Navbar />
+        <Navbar user={user} />
         <main className="h-full overflow-auto pt-24">{children}</main>
         <Toaster />
       </body>
