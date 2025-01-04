@@ -52,6 +52,7 @@ export function Navbar({ user }: NavbarProps) {
     const user = await loginUser(username, password);
     if (!user) {
       setError("Invalid credentials.");
+      return;
     }
 
     reset();

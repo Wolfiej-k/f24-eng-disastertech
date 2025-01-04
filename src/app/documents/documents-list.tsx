@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import AddDocumentForm from "./add-document-form";
 import DocumentCard from "./document-card";
 import { Document } from "./schema";
+import SearchesChart from "./searches-chart";
 
 export default function DocumentsList() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -63,6 +64,9 @@ export default function DocumentsList() {
         {documents.map((document) => (
           <DocumentCard key={document.id} document={document} editable={true} />
         ))}
+      </div>
+      <div className="mt-4">
+        <SearchesChart documents={documents} />
       </div>
     </div>
   );
