@@ -5,12 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TypographyP } from "@/components/ui/typography";
 import type { User } from "@/lib/auth";
-import { loginUser } from "@/lib/auth";
+import { loginUser, logoutUser } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleUser } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -30,7 +30,6 @@ type FormData = z.infer<typeof schema>;
 export function Navbar({ user }: NavbarProps) {
   const [error, setError] = useState<string | null>(null);
   const pathname = usePathname();
-  const router = useRouter();
 
   const routes = new Map<string, string>();
   routes.set("/", "Home");
@@ -55,7 +54,8 @@ export function Navbar({ user }: NavbarProps) {
       setError("Invalid credentials.");
     }
 
-    router.refresh();
+    reset();
+    window.location.reload();
   };
 
   return (
@@ -92,11 +92,10 @@ export function Navbar({ user }: NavbarProps) {
                 </PopoverTrigger>
                 <PopoverContent>
                   <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium">John Doe</p>
-                      <p className="text-sm text-gray-500">john@example.com</p>
-                    </div>
-                    <Button variant="destructive">Log Out</Button>
+                    <span className="text-md font-medium">{user.username}</span>
+                    <Button variant="destructive" onClick={() => void logoutUser()}>
+                      Log Out
+                    </Button>
                   </div>
                 </PopoverContent>
               </Popover>

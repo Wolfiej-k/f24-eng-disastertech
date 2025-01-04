@@ -1,5 +1,6 @@
 "use client";
 import { TypographyP } from "@/components/ui/typography";
+import { getUser } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import AddDocumentForm from "./add-document-form";
 import DocumentCard from "./document-card";
@@ -12,7 +13,14 @@ export default function DocumentsPage() {
 
   useEffect(() => {
     const fetchDocuments = async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents`);
+      const user = await getUser();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+
       if (!response.ok) {
         setError(true);
         return;

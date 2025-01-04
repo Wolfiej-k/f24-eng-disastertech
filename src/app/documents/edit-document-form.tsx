@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyP } from "@/components/ui/typography";
+import { toast } from "@/hooks/toast";
+import { getUser } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -25,39 +27,45 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents/${document.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+    const user = await getUser();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents/${document.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      return toast({
+        title: "Error!",
+        description: "Failed to update document.",
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to update document!");
-      }
-
-      reset();
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
     }
+
+    reset();
+    window.location.reload();
   };
 
   const onDelete = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents/${document.id}`, {
-        method: "DELETE",
-      });
+    const user = await getUser();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents/${document.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete document!");
-      }
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
+    if (!response.ok) {
+      return toast({
+        title: "Error!",
+        description: "Failed to delete document.",
+      });
     }
+
+    window.location.reload();
   };
 
   return (

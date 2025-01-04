@@ -16,6 +16,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = AUTH_SECRET
+app.config["JWT_COOKIE_SECURE"] = False # Change in production!
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -57,7 +58,7 @@ def handle_login():
       cursor.execute("SELECT hash FROM users WHERE username = %s", (username,))
       hash = cursor.fetchone()
       if hash and bcrypt.check_password_hash(hash[0], password):
-        token = create_access_token(identity={"username": username})
+        token = create_access_token(identity=username)
         return jsonify({"token": token}), HTTPStatus.OK
       return jsonify({"msg": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
   except:

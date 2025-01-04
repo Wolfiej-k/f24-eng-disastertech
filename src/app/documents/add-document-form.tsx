@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyP } from "@/components/ui/typography";
+import { getUser } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -20,24 +21,22 @@ export default function AddDocumentForm() {
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    const user = await getUser();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify(data),
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to add document!");
-      }
-
-      reset();
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
+    if (!response.ok) {
+      throw new Error("Failed to add document!");
     }
+
+    reset();
+    window.location.reload();
   };
 
   return (

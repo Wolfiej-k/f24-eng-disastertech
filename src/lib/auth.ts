@@ -1,6 +1,5 @@
 "use server";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export interface User {
   username: string;
@@ -19,12 +18,8 @@ export async function loginUser(username: string, password: string) {
     }),
   });
 
-  if (!response.ok) {
-    return null;
-  }
-
   const { token } = await response.json();
-  if (!token) {
+  if (!response.ok || !token) {
     return null;
   }
 
@@ -39,12 +34,10 @@ export async function loginUser(username: string, password: string) {
 
 export async function logoutUser() {
   cookies().delete("user");
-  redirect("/");
+  window.location.reload();
 }
 
 export async function getUser() {
-  console.log(cookies().getAll());
-
   const cookie = cookies().get("user");
   if (!cookie) {
     return null;

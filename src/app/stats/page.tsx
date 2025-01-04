@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TypographyP } from "@/components/ui/typography";
+import { getUser } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { Cell, Pie, PieChart, Tooltip as RechartsTooltip } from "recharts";
 
@@ -32,7 +33,13 @@ export default function Stats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stats`);
+        const user = await getUser();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stats`, {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+
         if (!response.ok) {
           throw new Error("Failed to fetch stats");
         }
