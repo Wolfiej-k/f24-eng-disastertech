@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, verify_jwt_in_request
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, get_jwt_identity, jwt_required, verify_jwt_in_request
 from http import HTTPStatus
+from datetime import timedelta
 import psycopg2
 import os
 import json
@@ -16,6 +17,8 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = AUTH_SECRET
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 app.config["JWT_COOKIE_SECURE"] = False # Change in production!
 
 bcrypt = Bcrypt(app)
@@ -58,11 +61,19 @@ def handle_login():
       cursor.execute("SELECT hash FROM users WHERE username = %s", (username,))
       hash = cursor.fetchone()
       if hash and bcrypt.check_password_hash(hash[0], password):
-        token = create_access_token(identity=username)
-        return jsonify({"token": token}), HTTPStatus.OK
+        access_token = create_access_token(identity=username)
+        refresh_token = create_refresh_token(identity=username)
+        return jsonify({"access": access_token, "refresh": refresh_token}), HTTPStatus.OK
       return jsonify({"msg": "Invalid credentials"}), HTTPStatus.UNAUTHORIZED
   except:
     return jsonify({"msg": "Internal server error"}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+@app.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def handle_refresh():
+  identity = get_jwt_identity()
+  access_token = create_access_token(identity=identity)
+  return jsonify({"access": access_token}), HTTPStatus.OK
 
 @app.route("/documents", methods=["GET", "POST"])
 @jwt_required()

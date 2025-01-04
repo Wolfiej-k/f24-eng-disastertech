@@ -17,7 +17,7 @@ export default function DocumentsPage() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/documents`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${user?.access}`,
         },
       });
 

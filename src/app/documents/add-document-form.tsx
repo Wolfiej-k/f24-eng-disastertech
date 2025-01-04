@@ -26,7 +26,7 @@ export default function AddDocumentForm() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${user?.token}`,
+        Authorization: `Bearer ${user?.access}`,
       },
       body: JSON.stringify(data),
     });

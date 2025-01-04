@@ -36,7 +36,7 @@ export default function Stats() {
         const user = await getUser();
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stats`, {
           headers: {
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${user?.access}`,
           },
         });
 

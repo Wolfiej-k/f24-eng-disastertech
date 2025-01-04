@@ -32,7 +32,7 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${user?.token}`,
+        Authorization: `Bearer ${user?.access}`,
       },
       body: JSON.stringify(data),
     });
@@ -54,7 +54,7 @@ export default function EditDocumentForm({ document }: EditDocumentFormProps) {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${user?.token}`,
+        Authorization: `Bearer ${user?.access}`,
       },
     });
 
