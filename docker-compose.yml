@@ -4,16 +4,8 @@ services:
       context: .
       dockerfile: app.Dockerfile
     container_name: frontend
-    environment:
-      - NEXT_PUBLIC_URL=http://localhost:3000
-      - API_PORT=4000
     ports:
       - "3000:3000"
-    volumes:
-      - ./src/app:/app/src/app
-      - ./src/components:/app/src/components
-      - ./src/hooks:/app/src/hooks
-      - ./src/lib:/app/src/lib
     depends_on:
       - api
 
