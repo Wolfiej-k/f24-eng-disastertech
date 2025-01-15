@@ -20,7 +20,6 @@ services:
       - POSTGRES_DB=offline-ai
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
-      - API_PORT=4000
       - AUTH_SECRET=${AUTH_SECRET}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - TOP_DOCUMENTS=5

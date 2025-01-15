@@ -1,9 +1,7 @@
 FROM python:3.9
-
 WORKDIR /api
 
-COPY requirements.txt ./
-
+# Install dependencies
 RUN apt-get update && \
     apt-get install -y \
     apt-transport-https \
@@ -19,6 +17,11 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y docker-ce-cli
 
+COPY requirements.txt ./
 RUN pip install -r requirements.txt
+RUN pip install gunicorn
 
-CMD ["python", "src/api/main.py"]
+# Run Flask server
+COPY /src/api ./
+
+CMD ["gunicorn", "--bind", "0.0.0.0:4000", "-w", "4", "main:app"]
